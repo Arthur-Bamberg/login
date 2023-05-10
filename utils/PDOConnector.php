@@ -3,6 +3,7 @@ require_once 'globals.php';
 
 class PDOConnector {
     private $pdo;
+    private $stmt;
 
     public function __construct() {
         $host = constant('DB_HOST');
@@ -14,12 +15,27 @@ class PDOConnector {
 
         try {
             $this->pdo = new PDO($dsn, $username, $password);
-            echo 'É us guri papai!!!';
-            
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            echo 'Connection failed: ' . $e->getMessage();
+            throw new Exception("Error connecting to database: " . $e->getMessage());
         }
     }    
-}
 
-$pdo = new PDOConnector();
+    public function query($sql, $params = []) {
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            $this->stmt = $stmt;
+        } catch (PDOException $e) {
+            throw new Exception("Error executing query: " . $e->getMessage());
+        }
+    }
+
+    public function getModelResult($class) {
+        return $this->stmt->fetchAll(PDO::FETCH_CLASS, $class);
+    }
+
+    public function getResult() {
+        return $this->stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+}
