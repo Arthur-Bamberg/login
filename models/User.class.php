@@ -1,5 +1,6 @@
 <?php
 require_once '../utils/PDOConnector.php';
+require_once 'Role.class.php';
 
 class User {
     private $pdo;
@@ -10,6 +11,8 @@ class User {
     private $email;
     private $password;
     private $phone;
+    private $safeParameters = "idUser, username, name, mediaUrl, email, phone";
+    private $roles = [];
     private $isActive;
 
     public function __construct() {
@@ -104,8 +107,52 @@ class User {
         $this->isActive = $isActive;
     }
 
+    public function getRoles() {
+        if(empty($this->roles)) {
+            $this->pdo->query(
+                "SELECT 
+                    role.idRole, role.name, role.description, role.isActive
+                FROM role
+                    INNER JOIN user_role 
+                        ON role.idRole = user_role.idRole
+                WHERE user_role.idUser = :idUser",
+                [':idUser' => $this->idUser]
+            );
+
+            $this->roles = $this->pdo->getModelResult('Role');
+        }
+
+        return $this->roles;
+    }
+
+    public function addRole($idRole) {
+        $this->pdo->query(
+            "INSERT INTO user_role (FK_idRole, FK_idUser, isActive)
+                VALUES (:idRole, :idUser, 1)
+            ON DUPLICATE KEY UPDATE
+                isActive = 1", 
+        [
+            ':idRole' => $idRole,
+            ':idUser' => $this->idUser
+        ]);
+
+        $this->setIdUser($this->pdo->getLastInsertedId());
+    }
+
+    public function removeRole($idRole) {
+        $this->pdo->query(
+            "UPDATE user_role 
+            SET isActive = 0
+            WHERE FK_idRole = :idRole
+            AND FK_idUser = :idUser", 
+        [
+            ':idRole' => $idRole,
+            ':idUser' => $this->idUser
+        ]);
+    }
+
     public function create() {
-        $this->pdo->query("INSERT INTO users (username, name, mediaUrl, email, password, phone) VALUES (:username, :name, :mediaUrl, :email, sha1(md5(:password)), :phone)", [
+        $this->pdo->query("INSERT INTO user (username, name, mediaUrl, email, password, phone) VALUES (:username, :name, :mediaUrl, :email, sha1(md5(:password)), :phone)", [
             ':username' => $this->username,
             ':name' => $this->name,
             ':mediaUrl' => $this->mediaUrl,
@@ -113,6 +160,8 @@ class User {
             ':password' => $this->password,
             ':phone' => $this->phone
         ]);
+
+        $this->setIdUser($this->pdo->getLastInsertedId());
     }
 
     public function update() {
@@ -131,6 +180,20 @@ class User {
         $this->pdo->query("UPDATE user SET isActive = 0 WHERE idUser = :idUser", [
             ':idUser' => $this->idUser
         ]);
+    }
+
+    public static function getById($idUser) {
+        $pdo = new PDOConnector();
+        $pdo->query(
+            "SELECT * 
+                FROM user
+            WHERE idUser = :idUser
+            AND isActive = 1",
+            [
+                ':idUser' => $idUser
+            ]
+        );
+        return $pdo->getModelResult(get_class(new self));
     }
 
     public static function getAll() {

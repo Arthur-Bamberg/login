@@ -31,6 +31,10 @@ class PDOConnector {
         }
     }
 
+    public function getLastInsertedId() {
+        return (int) $this->pdo->lastInsertId();
+    }
+
     public function getModelResult($class) {
         return $this->stmt->fetchAll(PDO::FETCH_CLASS, $class);
     }
