@@ -4,21 +4,27 @@ require_once '../models/User.class.php';
 $acao = $_GET['acao'];
 
 
-include_once '../model/Filme.class.php';
+include_once '../model/User.class.php';
 
 //Cadastrar no banco
 switch($acao){
 
 case "create":
+    //name mediaurl email password phone
     // cria um novo usuário
     $user = new User();
-    $user->setNome($_POST['nome']);
-    $user->save();
-    header('Location:../view/filme_mpa.php ');
+    $user->setUsername($_POST['nickname']);
+    $user->setName($_POST['nome']);
+    $user->setMediaUrl($_POST['foto']);
+    $user->setEmail($_POST['email']);
+    $user->setPassword($_POST['senha']);
+    $user->setPhone($_POST['telefone']);
+    $user->create();
+    header('Location:../view/users.php ');
         //atualiza a tela
-            $user = new Filme();
-            $user->setID($_REQUEST['id']);
-            $user->load();
+            $user = new User();
+            $user->setIdUser($_REQUEST['id']);
+            User::getAll();
     break;
 case "read":
     // pega e mostra todos user$user
@@ -26,24 +32,29 @@ case "read":
     break;
 case "updade":
     //atualiza um usuário cadastrado
-    $user = new Filme();
-    $user->setId($_POST['id']);
-    $user->setNome($_POST['nome']);
+    $user = new User();
+    $user->setIdUser($_POST['id']);
+    $user->setUsername($_POST['nickname']);
+    $user->setName($_POST['nome']);
+    $user->setMediaUrl($_POST['foto']);
+    $user->setEmail($_POST['email']);
+    $user->setPassword($_POST['senha']);
+    $user->setPhone($_POST['telefone']);
     $user->update();
-    header('Location:../view/filme_mpa.php ');
+    header('Location:../view/users.php ');
         //atualiza a tela
-            $user = new Filme();
-            $user->setID($_REQUEST['id']);
-            $user->load();
+            $user = new User();
+            $user->setIdUser($_REQUEST['id']);
+            $user->getAll();
     break;
 case "delete":
     //deleta um usuário
-    Filme::deletar($_REQUEST['id']);
-    header('Location:../view/filme_mpa.php ');
+    $user->delete($_REQUEST['id']);
+    header('Location:../view/users.php ');
         //atualiza a tela
-            $user = new Filme();
-            $user->setID($_REQUEST['id']);
-            $user->load();
+            $user = new User();
+            $user->setIdUser($_REQUEST['id']);
+            $user->getAll();
     break;
 }
 
