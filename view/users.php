@@ -3,43 +3,24 @@
 require_once '../models/User.class.php';
 require_once '../utils/PDOConnector.php';
 
+$users = User::getAll();
+$acao = 'create';
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve form data
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $users = new User();
+    $users->setIdUser($_REQUEST['id'];
+    //$users->load;
 
     // Validate form data
     if (empty($username) || empty($name) || empty($email) || empty($password) || empty($phone)) {
         $error = "All fields are required.";
     } else {
-        // Perform database operations to insert the user
-        // Assuming you have a MySQL database pdo$pdo already established
-
-        $username = mysqli_real_escape_string($pdo, $username);
-        $name = mysqli_real_escape_string($pdo, $name);
-        $mediaUrl = mysqli_real_escape_string($pdo, $mediaUrl);
-        $email = mysqli_real_escape_string($pdo, $email);
-        $password = mysqli_real_escape_string($pdo, $password);
-        $phone = mysqli_real_escape_string($pdo, $phone);
-
-        // Hash the password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        // Insert the user into the database
-        $acao = "create";
-
-        if (mysqli_query($pdo, $acao)) {
-            $success = "User registered successfully.";
-        } else {
-            $error = "Error: " . mysqli_error($pdo);
-        }
+        
     }
 }
 
 // Close the database pdo$pdo
-mysqli_close($pdo);
 ?>
 
 <!DOCTYPE html>
