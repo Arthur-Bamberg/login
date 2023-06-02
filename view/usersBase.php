@@ -9,7 +9,7 @@ $acao = 'create';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve form data
     $users = new User();
-    $users->setIdUser($_REQUEST['id'];
+    $users->setIdUser($_REQUEST['id']);
     //$users->load;
 
     // Validate form data
@@ -17,14 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "All fields are required.";
     } else {
         if(isset($_GET['id'])){
-            $users = new Filme();
+            $users = new User();
             $users->setIdUser($_REQUEST['id']);
             $users->load(); 
     
             $acao = 'update';
     
         }else{
-            $users = new Filme();
+            $users = new User();
         }
     }
 }

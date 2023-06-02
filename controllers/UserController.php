@@ -1,63 +1,108 @@
 <?php
 require_once '../models/User.class.php';
 
-$acao = $_GET['acao'];
+class UserController {
+    private $parameters;
 
+    public function __construct() {
+        if($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $method = $_GET['method'];
+            unset($_GET['method']);
 
-include_once '../model/User.class.php';
+            $this->parameters = (object) $_GET;
+        } else {
+            $this->parameters = json_decode(file_get_contents('php://input'));
+            $method = $this->parameters->method;
+        }
+        $this->$method();
+    }
 
-//Cadastrar no banco
-switch($acao){
+    public function createUser() { //Testado
+        $user = new User();
 
-case "create":
-    //name mediaurl email password phone
-    // cria um novo usuário
-    $user = new User();
-    $user->setUsername($_POST['nickname']);
-    $user->setName($_POST['nome']);
-    $user->setMediaUrl($_POST['foto']);
-    $user->setEmail($_POST['email']);
-    $user->setPassword($_POST['senha']);
-    $user->setPhone($_POST['telefone']);
-    $user->create();
-    header('Location:../view/users.php ');
-        //atualiza a tela
-            $user = new User();
-            $user->setIdUser($_REQUEST['id']);
-            User::getAll();
-    break;
-case "read":
-    // pega e mostra todos user$user
-    $user = User::getAll();
-    break;
-case "updade":
-    //atualiza um usuário cadastrado
-    $user = new User();
-    $user->setIdUser($_POST['id']);
-    $user->setUsername($_POST['nickname']);
-    $user->setName($_POST['nome']);
-    $user->setMediaUrl($_POST['foto']);
-    $user->setEmail($_POST['email']);
-    $user->setPassword($_POST['senha']);
-    $user->setPhone($_POST['telefone']);
-    $user->update();
-    header('Location:../view/users.php ');
-        //atualiza a tela
-            $user = new User();
-            $user->setIdUser($_REQUEST['id']);
-            $user->getAll();
-    break;
-case "delete":
-    //deleta um usuário
-    $user->delete($_REQUEST['id']);
-    header('Location:../view/users.php ');
-        //atualiza a tela
-            $user = new User();
-            $user->setIdUser($_REQUEST['id']);
-            $user->getAll();
-    break;
+        $user->setUsername($this->parameters->username);
+        $user->setName($this->parameters->name);
+        $user->setMediaUrl($this->parameters->mediaUrl);
+        $user->setEmail($this->parameters->email);
+        $user->setPassword($this->parameters->password);
+        $user->setPhone($this->parameters->phone);
+        $user->setIsActive(true);
+
+        try {
+            $user->create();
+            echo $user->toJson();
+        } catch (InvalidArgumentException $e) {
+            // Handle any validation errors
+            echo null;
+        }
+    }
+
+    public function updateUser() { 
+        $user = User::getById($this->parameters->idUser);
+
+        if ($user) {
+            $user->setUsername($this->parameters->username);
+            $user->setName($this->parameters->name);
+            $user->setMediaUrl($this->parameters->mediaUrl);
+            $user->setEmail($this->parameters->email);
+            $user->setPassword($this->parameters->password);
+            $user->setPhone($this->parameters->phone);
+
+            try {
+                $user->update();
+                echo $user->toJson();
+            } catch (InvalidArgumentException $e) {
+                // Handle any validation errors
+                echo json_encode($e);
+            }
+        }
+    }
+
+    public function deleteUser() {
+        $user = User::getById($this->parameters->idUser);
+
+        if ($user) {
+            $user->delete();
+            echo 'User deleted';
+        }
+
+        echo 'User not found';
+    }
+
+    public function getUser() {
+        echo json_encode(User::getById($this->parameters->idUser));
+    }
+
+    public function getAll() { //testado
+        echo json_encode(User::getAll());
+    }
+
+    public function addRoleToUser() {
+        $user = User::getById($this->parameters->idUser);
+
+        if ($user) {
+            try {
+                $user->addRole($this->parameters->idRole);
+                echo $user->toJson();
+            } catch (InvalidArgumentException $e) {
+                // Handle any validation errors
+                echo json_encode($e);
+            }
+        }
+
+        echo 'User not found';
+    }
+
+    public function removeRoleFromUser() {
+        $user = User::getById($this->parameters->idUser);
+
+        if ($user) {
+            $user->removeRole($this->parameters->idRole);
+            return $user;
+        }
+
+        echo 'User not found';
+    }
 }
 
-
-
-$test = 1;  
+new UserController();

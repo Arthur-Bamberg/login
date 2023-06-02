@@ -39,6 +39,10 @@ class PDOConnector {
         return $this->stmt->fetchAll(PDO::FETCH_CLASS, $class);
     }
 
+    public function getObjectResult() {
+        return $this->stmt->fetchAll(PDO::FETCH_OBJ);
+    }
+
     public function getResult() {
         return $this->stmt->fetchAll(PDO::FETCH_OBJ);
     }

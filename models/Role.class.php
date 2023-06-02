@@ -88,7 +88,7 @@ class Role {
         ]);
     }
 
-    public static function getByUser($idUser) {
+    public static function getByUser($idUser, $objectMode = false) {
         $pdo = new PDOConnector();
         $pdo->query(
             "SELECT * 
@@ -105,7 +105,11 @@ class Role {
                 ':idUser' => $idUser
             ]
         );
-        return $pdo->getModelResult(get_class(new self));
+        if($objectMode) {
+            return $pdo->getObjectResult();
+        }
+
+        return $pdo->getModelResult(get_class(new self))[0];
     }
 
     public static function getById($idRole) {

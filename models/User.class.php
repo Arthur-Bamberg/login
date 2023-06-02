@@ -57,7 +57,7 @@ class User {
     }
 
     public function setMediaUrl($mediaUrl) {
-        if (!filter_var($mediaUrl, FILTER_VALIDATE_URL)) {
+        if (!filter_var($mediaUrl, FILTER_VALIDATE_URL) && !empty($mediaUrl)) {
             throw new InvalidArgumentException('Invalid value for mediaUrl');
         }
         $this->mediaUrl = $mediaUrl;
@@ -182,7 +182,28 @@ class User {
         ]);
     }
 
-    public static function getById($idUser) {
+    public function toJson() {
+        $data = array(
+            'idUser' => $this->idUser,
+            'username' => $this->username,
+            'name' => $this->name,
+            'mediaUrl' => $this->mediaUrl,
+            'email' => $this->email,
+            'password' => $this->password,
+            'phone' => $this->phone,
+            'isActive' => $this->isActive
+        );
+
+        $roles = array();
+        foreach ($this->roles as $role) {
+            $roles[] = $role->toJson();
+        }
+        $data['roles'] = $roles;
+
+        return json_encode($data);
+    }
+
+    public static function getById($idUser, $objectMode = false) {
         $pdo = new PDOConnector();
         $pdo->query(
             "SELECT * 
@@ -193,7 +214,12 @@ class User {
                 ':idUser' => $idUser
             ]
         );
-        return $pdo->getModelResult(get_class(new self));
+
+        if($objectMode) {
+            return $pdo->getObjectResult();
+        }
+
+        return $pdo->getModelResult(get_class(new self))[0];
     }
 
     public static function getAll() {
@@ -203,6 +229,7 @@ class User {
                 FROM user
             WHERE isActive = 1"
         );
-        return $pdo->getModelResult(get_class(new self));
+
+        return $pdo->getObjectResult();
     }
 }
