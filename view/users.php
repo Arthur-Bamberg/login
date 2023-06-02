@@ -16,7 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($name) || empty($email) || empty($password) || empty($phone)) {
         $error = "All fields are required.";
     } else {
-        
+        if(isset($_GET['id'])){
+            $users = new Filme();
+            $users->setIdUser($_REQUEST['id']);
+            $users->load(); 
+    
+            $acao = 'update';
+    
+        }else{
+            $users = new Filme();
+        }
     }
 }
 
@@ -24,20 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+    <style>
+        :root {
+            --bs-table-striped-color: pink;
+}
+    </style>
 </head>
+
 <body>
-    <h2>Registro de usuário</h2>
-    <?php if (isset($error)): ?>
-        <p style="color: red;"><?php echo $error; ?></p>
-    <?php endif; ?>
-    <?php if (isset($success)): ?>
-        <p style="color: green;"><?php echo $success; ?></p>
-    <?php endif; ?>
-    <form method="POST" action="">
-        <label>Nome de usuário (nickname):</label>
+    <form action="../controllers/UserController.php?acao=<?= $acao ?>" method="POST">
+    <label>Nome de usuário (nickname):</label>
         <input type="text" name="nome" required><br><br>
         <label>Nome completo:</label>
         <input type="text" name="nome" required><br><br>
@@ -50,8 +64,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label>Telefone:</label>
         <input type="tel" name="phone" required><br><br>
         <input type="submit" value="Register">
-    </form>
-</body>
-</html>
 
+        <input type="hidden" name="id" value="<?= $role->getIdUser()?>" />
+
+        <input type="submit" value="Enviar" />
+
+    </form>
+
+
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <?php foreach($roles as $role){ ?>
+            <tr>
+                <td>
+                    <?php echo $role->getIdUser() ?>
+                </td>
+                <td>
+                    <?= $role->getNome() ?>
+                </td>
+                <td>
+                    <a href="../controllers/role.php?acao=delete&id=<?= $role->getIdUser() ?>" class="btn btn-danger">Excluir</a>
+                    <a href="?id=<?= $role->getIdUser() ?>" class="btn btn-success">Editar</a>
+
+                </td>
+            </tr>
+            <?php } ?>        
+        </tbody>
+    </table>
+
+</body>
+
+</html>
 
