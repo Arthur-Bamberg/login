@@ -1,61 +1,76 @@
 <?php
 require_once '../models/Role.class.php';
 
-$acao = $_GET['acao'];
+class RoleController {
+    private $parameters;
+    private $getMethods = ['getRole', 'getAll'];
 
+    public function __construct() {
+        if($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $method = $_GET['method'];
+            unset($_GET['method']);
 
-include_once '../model/Role.class.php';
+            if (!in_array($method, $this->getMethods)) {
+                throw new InvalidArgumentException('Invalid method');
+            }
 
-//Cadastrar no banco
-switch($acao){
+            $this->parameters = (object) $_GET;
+        } else {
+            $this->parameters = json_decode(file_get_contents('php://input'));
+            $method = $this->parameters->method;
+        }
+        $this->$method();
+    }
 
-case "create":
-    //name mediaurl email password phone
-    // cria um novo papel
-    $role = new Role();
-    $role->setName($_POST['nome']);
-    $role->setDescription($_POST['description']);
-    $role->setIsActive($_POST['isActive']);
-    $role->create();
-    header('Location:../view/roles.php ');
-        //atualiza a tela
-            $role = new Role();
-            $role->setIdRole($_REQUEST['id']);
-            Role::getAll();
-    break;
-case "read":
-    // pega e mostra todos user$role
-    $role = Role::getAll();
-    break;
-case "updade":
-    //atualiza um papel cadastrado
-    $role = new Role();
-    $role->setIdRole($_POST['id']);
-    $role->setName($_POST['nome']);
-    $role->setDescription($_POST['description']);
-    $role->setIsActive($_POST['IsActive']);
-    $role->update();
-    header('Location:../view/roles.php ');
-        //atualiza a tela
-            $role = new Role();
-            $role->setIdRole($_REQUEST['id']);
-            $role->getAll();
-    break;
-case "delete":
-    //deleta um papel
-    $role->delete($_REQUEST['id']);
-    header('Location:../view/roles.php ');
-        //atualiza a tela
-            $role = new Role();
-            $role->setIdRole($_REQUEST['id']);
-            $role->getAll();
-    break;
+    public function createRole() {
+        $role = new Role();
+
+        $role->setName($this->parameters->name);
+        $role->setDescription($this->parameters->description);
+        $role->setIsActive(true);
+
+        try {
+            $role->create();
+            echo $role->toJson();
+        } catch (InvalidArgumentException $e) {
+            echo json_encode($e);
+        }
+    }
+
+    public function updateRole() {
+        $role = Role::getById($this->parameters->idRole);
+
+        if ($role) {
+            $role->setName($this->parameters->name);
+            $role->setDescription($this->parameters->description);
+
+            try {
+                $role->update();
+                echo $role->toJson();
+            } catch (InvalidArgumentException $e) {
+                echo json_encode($e);
+            }
+        }
+    }
+
+    public function deleteRole() {
+        $role = Role::getById($this->parameters->idRole);
+
+        if ($role) {
+            $role->delete();
+            echo 'Role deleted';
+        } else {
+            echo 'Role not found';
+        }
+    }
+
+    public function getRole() {
+        echo json_encode(Role::getById($this->parameters->idRole, true));
+    }
+
+    public function getAll() { 
+        echo json_encode(Role::getAll());
+    }
 }
 
-
-
-$test = 1;  
-
-
-
-?>
+new RoleController();

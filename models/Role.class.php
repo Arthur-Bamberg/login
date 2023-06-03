@@ -112,18 +112,35 @@ class Role {
         return $pdo->getModelResult(get_class(new self))[0];
     }
 
-    public static function getById($idRole) {
+    public function toJson() {
+        $data = array(
+            'idRole' => $this->idRole,
+            'name' => $this->name,
+            'description' => $this->description,
+            'isActive' => $this->isActive
+        );
+
+        return json_encode($data);
+    }
+
+    public static function getById($idRole, $objectMode = false) {
         $pdo = new PDOConnector();
         $pdo->query(
             "SELECT * 
                 FROM role
             WHERE
-                role.isActive = 1",
+                idRole = :idRole
+                and role.isActive = 1",
             [
                 ':idRole' => $idRole
             ]
         );
-        return $pdo->getModelResult(get_class(new self));
+
+        if($objectMode) {
+            return $pdo->getObjectResult();
+        }
+        
+        return $pdo->getModelResult(get_class(new self))[0];
     }
 
     public static function getAll() {
@@ -133,6 +150,6 @@ class Role {
                 FROM role
             WHERE isActive = 1"
         );
-        return $pdo->getModelResult(get_class(new self));
+        return $pdo->getObjectResult();
     }
 }       

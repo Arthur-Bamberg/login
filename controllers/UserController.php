@@ -3,10 +3,16 @@ require_once '../models/User.class.php';
 
 class UserController {
     private $parameters;
+    private $getMethods = ['getUser', 'getAll'];
 
     public function __construct() {
         if($_SERVER['REQUEST_METHOD'] === 'GET') {
             $method = $_GET['method'];
+
+            if (!in_array($method, $this->getMethods)) {
+                throw new InvalidArgumentException('Invalid method');
+            }
+            
             unset($_GET['method']);
 
             $this->parameters = (object) $_GET;
@@ -17,7 +23,7 @@ class UserController {
         $this->$method();
     }
 
-    public function createUser() { //Testado
+    public function createUser() {
         $user = new User();
 
         $user->setUsername($this->parameters->username);
@@ -37,7 +43,7 @@ class UserController {
         }
     }
 
-    public function updateUser() { 
+    public function updateUser() {
         $user = User::getById($this->parameters->idUser);
 
         if ($user) {
@@ -64,16 +70,16 @@ class UserController {
         if ($user) {
             $user->delete();
             echo 'User deleted';
+        } else {
+            echo 'User not found';
         }
-
-        echo 'User not found';
     }
 
     public function getUser() {
-        echo json_encode(User::getById($this->parameters->idUser));
+        echo json_encode(User::getById($this->parameters->idUser, true));
     }
 
-    public function getAll() { //testado
+    public function getAll() {
         echo json_encode(User::getAll());
     }
 
