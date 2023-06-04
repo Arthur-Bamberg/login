@@ -12,24 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $users->setIdUser($_REQUEST['id']);
     //$users->load;
 
-    // Validate form data
-    if (empty($username) || empty($name) || empty($email) || empty($password) || empty($phone)) {
-        $error = "All fields are required.";
-    } else {
         if(isset($_GET['id'])){
             $users = new User();
             $users->setIdUser($_REQUEST['id']);
-            $users->load(); 
     
             $acao = 'update';
     
         }else{
             $users = new User();
         }
-    }
 }
 
-// Close the database pdo$pdo
 ?>
 
 <!DOCTYPE html>

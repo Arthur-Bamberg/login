@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexUser</title>
+</head>
+<body>
+    <form action="http://localhost/trabalho/controllers/UserController.php" method="POST">
+        <label>Nome de usuário (nickname):</label>
+            <input type="text" name="nome" required><br><br>
+            <label>Nome completo:</label>
+            <input type="text" name="nome" required><br><br>
+            <label>Foto de perfil:</label>
+            <input type="image" name="foto"><br><br>
+            <label>Email:</label>
+            <input type="email" name="email" required><br><br>
+            <label>Senha:</label>
+            <input type="password" name="senha" required><br><br>
+            <label>Telefone:</label>
+            <input type="tel" name="phone" required><br><br>
+            <input type="hidden" name="id" value="<?= $role->getIdUser()?>" />
+    
+            <input type="submit" value="Enviar" />
+    
+        </form>
+</body>
+</html>
