@@ -47,12 +47,29 @@ class UserController {
         $user = User::getById($this->parameters->idUser);
 
         if ($user) {
-            $user->setUsername($this->parameters->username);
-            $user->setName($this->parameters->name);
-            $user->setMediaUrl($this->parameters->mediaUrl);
-            $user->setEmail($this->parameters->email);
-            $user->setPassword($this->parameters->password);
-            $user->setPhone($this->parameters->phone);
+            foreach ($this->parameters as $key => $value) {
+                switch ($key) {
+                    case 'username':
+                        $user->setUsername($this->parameters->username);
+                        break;
+
+                    case 'name':
+                        $user->setName($this->parameters->name);
+                        break;
+
+                    case 'mediaUrl':
+                        $user->setMediaUrl($this->parameters->mediaUrl);
+                        break;
+
+                    case 'email':
+                        $user->setEmail($this->parameters->email);
+                        break;
+
+                    case 'phone':
+                        $user->setPhone($this->parameters->phone);
+                        break;
+                }
+            }
 
             try {
                 $user->update();

@@ -110,6 +110,69 @@ async function editItem(li) {
         const name = input.getAttribute('name');
         input.value = data[name];
     });
+
+    const header = document.querySelector('#header');
+    header.innerText = 'Editar Usuário';
+
+    const button = form.querySelector('button');
+    button.innerText = 'Editar';
+    button.addEventListener('click', function () {
+        updateUser(idUser);
+    });
+
+    const passwordDiv = document.querySelector('#passwordDiv');
+    passwordDiv.classList.add('d-none');
+
+    const cancelButton = document.createElement('button');
+    cancelButton.classList.add('btn', 'btn-danger', 'btn-sm');
+    cancelButton.innerText = 'Cancelar';
+    cancelButton.addEventListener('click', function () {
+        cancelEdit();
+    });
+}
+
+async function updateUser(idUser) {
+    const inputs = form.querySelectorAll('input');
+
+    const formData = {};
+    inputs.forEach(function (input) {
+        const name = input.getAttribute('name');
+        const value = input.value;
+        formData[name] = value;
+    });
+
+    formData['idUser'] = idUser;
+    formData['method'] = 'updateUser';
+
+    const connector = new Connector('UserController');
+    const data = await connector.postRequest(formData);
+
+    form.reset();
+
+    reloadScreen()
+}
+
+function cancelEdit() {
+    const form = document.querySelector('form');
+
+    const header = document.querySelector('#h1');
+    header.innerText = 'Criar Usuário';
+
+    const button = form.querySelector('button');
+    button.innerText = 'Criar';
+    clearEventListeners(button);
+    button.addEventListener('click', function () {
+        createUser();
+    });
+
+    const passwordDiv = document.querySelector('#passwordDiv');
+    passwordDiv.classList.remove('d-none');
+
+    const cancelButton = form.querySelector('.btn .btn-danger .btn-sm');
+
+    form.removeChild(cancelButton);
+
+    form.reset();
 }
 
 function reloadScreen() {
