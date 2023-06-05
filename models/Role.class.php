@@ -91,7 +91,7 @@ class Role {
     public static function getByUser($idUser, $objectMode = false) {
         $pdo = new PDOConnector();
         $pdo->query(
-            "SELECT * 
+            "SELECT role.idRole, role.name, role.description, role.isActive 
                 FROM role
                     inner join user_role 
                         on role.idRole = user_role.FK_idRole
@@ -109,7 +109,7 @@ class Role {
             return $pdo->getObjectResult();
         }
 
-        return $pdo->getModelResult(get_class(new self))[0];
+        return $pdo->getModelResult(get_class(new self))[0] ?? null;
     }
 
     public function toJson() {

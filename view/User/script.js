@@ -4,6 +4,7 @@ const form = document.querySelector('form');
 
 (async () => {
     createUsersList();
+    createRolesList();
     form.addEventListener('submit', createUser);
 })();
 
@@ -48,14 +49,44 @@ async function createUsersList() {
         const email = document.createElement('p');
         email.innerText = 'Email: ' + user.email;
 
+        const roles = document.createElement('div');
+        roles.innerHTML = '<h6>Funções:</h6>';
+
+        user.roles.forEach(function (role) {
+            const roleName = document.createElement('p');
+            roleName.innerText = 'Nome: ' + role.name;
+
+            const roleDescription = document.createElement('p');
+            roleDescription.innerText = 'Descrição: ' + role.description;
+
+            roles.appendChild(roleName);
+            roles.appendChild(roleDescription);
+        });
+
         li.appendChild(name);
         li.appendChild(username);
         li.appendChild(phone);
         li.appendChild(email);
+        li.appendChild(roles);
         li.appendChild(div);
         li.setAttribute('id', user.idUser);
 
         list.appendChild(li);
+    });
+}
+
+async function createRolesList() {
+    const select = document.querySelector('#roles');
+
+    const connector = new Connector('RoleController');
+    const data = await connector.getRequest('getAll');
+
+    data.forEach(function (role) {
+        const option = document.createElement('option');
+        option.innerText = role.name;
+        option.setAttribute('value', role.idRole);
+
+        select.appendChild(option);
     });
 }
 
@@ -169,7 +200,7 @@ function cancelEdit() {
 
     const button = form.querySelector('button');
     button.innerText = 'Criar';
-    button.removeEventListener('click', updateUser);    
+    button.removeEventListener('click', updateUser);
     button.addEventListener('click', createUser);
 
     const passwordDiv = document.querySelector('#passwordDiv');

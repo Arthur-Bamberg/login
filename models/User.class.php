@@ -216,10 +216,14 @@ class User {
         );
 
         if($objectMode) {
-            return $pdo->getObjectResult()[0];
+            $user = $pdo->getObjectResult()[0];
+        } else {
+            $user = $pdo->getModelResult(get_class(new self))[0];
         }
 
-        return $pdo->getModelResult(get_class(new self))[0];
+        $user->roles = Role::getByUser($user->idUser, true);
+
+        return $user;
     }
 
     public static function getAll() {
@@ -230,6 +234,12 @@ class User {
             WHERE isActive = 1"
         );
 
-        return $pdo->getObjectResult();
+        $users = $pdo->getObjectResult();
+
+        foreach ($users as $user) {
+            $user->roles = Role::getByUser($user->idUser, true);
+        }
+
+        return $users;
     }
 }
