@@ -216,7 +216,7 @@ class User {
         );
 
         if($objectMode) {
-            return $pdo->getObjectResult();
+            return $pdo->getObjectResult()[0];
         }
 
         return $pdo->getModelResult(get_class(new self))[0];

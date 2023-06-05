@@ -1,47 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
+
 <head>
-    <title>User Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <title>Usuários</title>
 </head>
+
 <body>
     <div class="container">
-        <h2>Create User</h2>
-        <form method="post" action="../usersBase.php">
-            <div class="mb-3">
-                <label for="" class="form-label">Nome de usuário (nickname):</label>
-                <input type="text" name="nickname" id="nickname" class="form-control">
-            </div>
-            <br>
-            <div class="mb-3">
-                <label for="name" class="form-label">Nome completo:</label>
-                <textarea name="name" id="name" class="form-control"></textarea> <br>
-            </div>
-            <div class="mb-3">
-                <label for="" class="form-label"> Foto de perfil</label>
-                <input type="image" name="foto">
-            </div>
-            <br>
-            <div class="mb-3">
-                <label for="" class="form-label">Email:</label>
-                <input type="text" name="email" id="email" class="form-control">
-            </div>
-            <br>
-            <div>
-                <label for=""class="form-label">Senha</label>
-                <input type="password" name="password" id="password" class="form-control">
-            </div>
-            <br>
-            <div>
-                <label for="" class="form-label">Telefone</label>
-                <input type="tel" name="phone" id="phone" class="form-control">
-            </div>
-            <br>
-            <input type="hidden" name="id" value="<?= $role->getIdUser()?>" />
-            <button type="submit" class="btn btn-primary">enviar</button>
-        </form>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/js/bootstrap.bundle.min.js"></script>
+        <h1>Criar Usuário</h1>
+        <form>
+            <div class="form-group">
+                <label for="name">Nome:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Apelido:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="mediaUrl">URL da mídia:</label>
+                <input type="text" class="form-control" id="mediaUrl" name="mediaUrl" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="phone">Telefone:</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+    
+            <button type="submit" class="btn btn-primary">Criar</button>
+        </form>
+
+        <h1>Lista de usuários</h1>
+
+        <ul class="list-group">
+
+        </ul>
+    </div>
 </body>
+<script type="module" src="./script.js"></script>
+
 </html>
