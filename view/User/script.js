@@ -1,10 +1,11 @@
 import { Connector } from "../Connector.js";
 
+const form = document.querySelector('form');
+
 (async () => {
     createUsersList();
-
-    const form = document.querySelector('form');
-    form.addEventListener('submit', createUser);
+    const button = form.querySelector('#submitButton');
+    button.addEventListener('submit', createUser);
 })();
 
 async function createUsersList() {
@@ -116,9 +117,14 @@ async function editItem(li) {
 
     const button = form.querySelector('button');
     button.innerText = 'Editar';
-    button.addEventListener('click', function () {
-        updateUser(idUser);
-    });
+    button.removeEventListener('click', createUser);
+
+    const updateOnClick = async function (event) {
+        event.preventDefault();
+        await updateUser(idUser);
+    }
+
+    button.addEventListener('click', updateOnClick);
 
     const passwordDiv = document.querySelector('#passwordDiv');
     passwordDiv.classList.add('d-none');
@@ -126,9 +132,10 @@ async function editItem(li) {
     const cancelButton = document.createElement('button');
     cancelButton.classList.add('btn', 'btn-danger', 'btn-sm');
     cancelButton.innerText = 'Cancelar';
-    cancelButton.addEventListener('click', function () {
-        cancelEdit();
-    });
+
+    cancelButton.addEventListener('click', cancelEdit);
+
+    form.appendChild(cancelButton);
 }
 
 async function updateUser(idUser) {
@@ -149,21 +156,21 @@ async function updateUser(idUser) {
 
     form.reset();
 
-    reloadScreen()
+    cancelEdit();
+
+    reloadScreen();
 }
 
 function cancelEdit() {
     const form = document.querySelector('form');
 
-    const header = document.querySelector('#h1');
+    const header = document.querySelector('#header');
     header.innerText = 'Criar Usuário';
 
     const button = form.querySelector('button');
     button.innerText = 'Criar';
-    clearEventListeners(button);
-    button.addEventListener('click', function () {
-        createUser();
-    });
+    button.removeEventListener('click', updateUser);    
+    button.addEventListener('click', createUser);
 
     const passwordDiv = document.querySelector('#passwordDiv');
     passwordDiv.classList.remove('d-none');
