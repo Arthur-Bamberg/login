@@ -3,16 +3,16 @@ import { Connector } from "../Connector.js";
 const form = document.querySelector('form');
 
 (async () => {
-    createUsersList();
-    form.addEventListener('submit', createUser);
+    createRolesList();
+    form.addEventListener('submit', createRole);
 })();
 
-async function createUsersList() {
+async function createRolesList() {
     const list = document.querySelector('.list-group');
-    const connector = new Connector('UserController');
+    const connector = new Connector('RoleController');
     const data = await connector.getRequest('getAll');
 
-    data.forEach(function (user) {
+    data.forEach(function (role) {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
 
@@ -37,29 +37,21 @@ async function createUsersList() {
         div.appendChild(editButton);
 
         const name = document.createElement('h5');
-        name.innerText = 'Nome: ' + user.name;
+        name.innerText = 'Nome da função: ' + role.name;
 
-        const username = document.createElement('p');
-        username.innerText = 'Apelido: ' + user.username;
-
-        const phone = document.createElement('p');
-        phone.innerText = 'Telefone: ' + user.phone;
-
-        const email = document.createElement('p');
-        email.innerText = 'Email: ' + user.email;
+        const description = document.createElement('p');
+        description.innerText = 'Descrição: ' + role.description;
 
         li.appendChild(name);
-        li.appendChild(username);
-        li.appendChild(phone);
-        li.appendChild(email);
-        li.appendChild(div);
-        li.setAttribute('id', user.idUser);
+        li.appendChild(description);
+        li.setAttribute('id', role.idRole);
 
+        li.appendChild(div);
         list.appendChild(li);
     });
 }
 
-async function createUser(event) {
+async function createRole(event) {
     event.preventDefault();
 
     const inputs = form.querySelectorAll('input');
@@ -71,9 +63,9 @@ async function createUser(event) {
         formData[name] = value;
     });
 
-    formData['method'] = 'createUser';
+    formData['method'] = 'createRole';
 
-    const connector = new Connector('UserController');
+    const connector = new Connector('RoleController');
     const data = await connector.postRequest(formData);
 
     form.reset();
@@ -82,26 +74,26 @@ async function createUser(event) {
 }
 
 async function deleteItem(li) {
-    const idUser = li.getAttribute('id');
+    const idRole = li.getAttribute('id');
 
     const formData = {};
-    formData['idUser'] = idUser;
-    formData['method'] = 'deleteUser';
+    formData['idRole'] = idRole;
+    formData['method'] = 'deleteRole';
 
-    const connector = new Connector('UserController');
+    const connector = new Connector('RoleController');
     const data = await connector.postRequest(formData);
 
     await reloadScreen();
 }
 
 async function editItem(li) {
-    const idUser = li.getAttribute('id');
+    const idRole = li.getAttribute('id');
 
     const formData = {};
-    formData['idUser'] = idUser;
-    formData['method'] = 'getUser';
+    formData['idRole'] = idRole;
+    formData['method'] = 'getRole';
 
-    const connector = new Connector('UserController');
+    const connector = new Connector('RoleController');
     const data = await connector.postRequest(formData);
 
     const form = document.querySelector('form');
@@ -112,21 +104,18 @@ async function editItem(li) {
     });
 
     const header = document.querySelector('#header');
-    header.innerText = 'Editar Usuário';
+    header.innerText = 'Editar Função';
 
     const button = form.querySelector('button');
     button.innerText = 'Salvar';
-    button.removeEventListener('click', createUser);
+    button.removeEventListener('click', createRole);
 
     const updateOnClick = async function (event) {
         event.preventDefault();
-        await updateUser(idUser);
+        await updateRole(idRole);
     }
 
     button.addEventListener('click', updateOnClick);
-
-    const passwordDiv = document.querySelector('#passwordDiv');
-    passwordDiv.classList.add('d-none');
 
     const cancelButton = document.createElement('button');
     cancelButton.classList.add('btn', 'btn-danger', 'btn-sm');
@@ -138,7 +127,7 @@ async function editItem(li) {
     form.appendChild(cancelButton);
 }
 
-async function updateUser(idUser) {
+async function updateRole(idRole) {
     const inputs = form.querySelectorAll('input');
 
     const formData = {};
@@ -148,10 +137,10 @@ async function updateUser(idUser) {
         formData[name] = value;
     });
 
-    formData['idUser'] = idUser;
-    formData['method'] = 'updateUser';
+    formData['idRole'] = idRole;
+    formData['method'] = 'updateRole';
 
-    const connector = new Connector('UserController');
+    const connector = new Connector('RoleController');
     const data = await connector.postRequest(formData);
 
     form.reset();
@@ -165,15 +154,12 @@ function cancelEdit() {
     const form = document.querySelector('form');
 
     const header = document.querySelector('#header');
-    header.innerText = 'Criar Usuário';
+    header.innerText = 'Criar Função';
 
     const button = form.querySelector('button');
     button.innerText = 'Criar';
-    button.removeEventListener('click', updateUser);    
-    button.addEventListener('click', createUser);
-
-    const passwordDiv = document.querySelector('#passwordDiv');
-    passwordDiv.classList.remove('d-none');
+    button.removeEventListener('click', updateRole);    
+    button.addEventListener('click', createRole);
 
     const cancelButton = document.querySelector('#cancelButton');
 
@@ -186,5 +172,5 @@ async function reloadScreen() {
     const list = document.querySelector('.list-group');
     list.innerHTML = '';
 
-    await createUsersList();
+    await createRolesList();
 }
