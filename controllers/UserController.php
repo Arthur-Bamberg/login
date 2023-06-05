@@ -100,7 +100,7 @@ class UserController {
         echo json_encode(User::getAll());
     }
 
-    public function addRoleToUser() {
+    public function addRole() {
         $user = User::getById($this->parameters->idUser);
 
         if ($user) {
@@ -116,7 +116,7 @@ class UserController {
         echo 'User not found';
     }
 
-    public function removeRoleFromUser() {
+    public function removeRole() {
         $user = User::getById($this->parameters->idUser);
 
         if ($user) {

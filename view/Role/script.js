@@ -19,13 +19,6 @@ async function createRolesList() {
         const div = document.createElement('div');
         div.classList.add('float-right');
 
-        const deleteButton = document.createElement('button');
-        deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
-        deleteButton.addEventListener('click', function () {
-            deleteItem(li);
-        });
-        deleteButton.innerText = 'Excluir';
-
         const editButton = document.createElement('button');
         editButton.classList.add('btn', 'btn-primary', 'btn-sm');
         editButton.addEventListener('click', function () {
@@ -33,8 +26,15 @@ async function createRolesList() {
         });
         editButton.innerText = 'Editar';
 
-        div.appendChild(deleteButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+        deleteButton.addEventListener('click', function () {
+            deleteItem(li);
+        });
+        deleteButton.innerText = 'Excluir';
+
         div.appendChild(editButton);
+        div.appendChild(deleteButton);
 
         const name = document.createElement('h5');
         name.innerText = 'Nome da função: ' + role.name;

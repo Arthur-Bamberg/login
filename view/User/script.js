@@ -20,13 +20,6 @@ async function createUsersList() {
         const div = document.createElement('div');
         div.classList.add('float-right');
 
-        const deleteButton = document.createElement('button');
-        deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
-        deleteButton.addEventListener('click', function () {
-            deleteItem(li);
-        });
-        deleteButton.innerText = 'Excluir';
-
         const editButton = document.createElement('button');
         editButton.classList.add('btn', 'btn-primary', 'btn-sm');
         editButton.addEventListener('click', function () {
@@ -34,8 +27,15 @@ async function createUsersList() {
         });
         editButton.innerText = 'Editar';
 
-        div.appendChild(deleteButton);
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+        deleteButton.addEventListener('click', function () {
+            deleteItem(li);
+        });
+        deleteButton.innerText = 'Excluir';
+
         div.appendChild(editButton);
+        div.appendChild(deleteButton);
 
         const name = document.createElement('h5');
         name.innerText = 'Nome: ' + user.name;
@@ -76,17 +76,29 @@ async function createUsersList() {
 }
 
 async function createRolesList() {
-    const select = document.querySelector('#roles');
+    const rolesContainer = document.getElementById('roles');
 
     const connector = new Connector('RoleController');
-    const data = await connector.getRequest('getAll');
+    const rolesData = await connector.getRequest('getAll');
 
-    data.forEach(function (role) {
-        const option = document.createElement('option');
-        option.innerText = role.name;
-        option.setAttribute('value', role.idRole);
+    rolesData.forEach(function (role) {
+        const div = document.createElement('div');
 
-        select.appendChild(option);
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = role.idRole;
+        checkbox.name = 'roles';
+        checkbox.value = role.idRole;
+
+        const label = document.createElement('label');
+        label.htmlFor = role.idRole;
+        label.innerText = role.name;
+        label.classList.add('ml-2');
+
+        div.appendChild(checkbox);
+        div.appendChild(label);
+
+        rolesContainer.appendChild(div);
     });
 }
 
@@ -106,6 +118,19 @@ async function createUser(event) {
 
     const connector = new Connector('UserController');
     const data = await connector.postRequest(formData);
+
+    const checkboxes = document.querySelectorAll('input[name="roles"]:checked');
+    const checkedIds = Array.from(checkboxes).map(checkbox => checkbox.id);
+
+    for (const idRole of checkedIds) {
+        const formData = {};
+        formData['idUser'] = data.idUser;
+        formData['idRole'] = idRole;
+        formData['method'] = 'addRole';
+
+        const connector = new Connector('UserController');
+        const rolesData = await connector.postRequest(formData);
+    }
 
     form.reset();
 
