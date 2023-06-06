@@ -12,6 +12,8 @@ async function createRolesList() {
     const connector = new Connector('RoleController');
     const data = await connector.getRequest('getAll');
 
+    clearList();
+
     data.forEach(function (role) {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
@@ -107,6 +109,8 @@ async function editItem(li) {
     button.removeEventListener('click', createRole);
 
     const updateOnClick = async function (event) {
+        const button = form.querySelector('button');
+        button.removeEventListener('click', updateOnClick);
         event.preventDefault();
         await updateRole(idRole);
     }
@@ -137,7 +141,11 @@ async function updateRole(idRole) {
     formData['method'] = 'updateRole';
 
     const connector = new Connector('RoleController');
-    const data = await connector.postRequest(formData);
+    try {
+        const data = await connector.postRequest(formData);
+    } catch (error) {
+        console.log(error);        
+    }
 
     form.reset();
 
@@ -165,8 +173,10 @@ function cancelEdit() {
 }
 
 async function reloadScreen() {
+    await createRolesList();
+}
+
+function clearList() {
     const list = document.querySelector('.list-group');
     list.innerHTML = '';
-
-    await createRolesList();
 }

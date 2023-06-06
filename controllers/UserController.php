@@ -111,9 +111,9 @@ class UserController {
                 // Handle any validation errors
                 echo json_encode($e);
             }
+        } else {
+            echo 'User not found';
         }
-
-        echo 'User not found';
     }
 
     public function removeRole() {

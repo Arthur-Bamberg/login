@@ -13,6 +13,8 @@ async function createUsersList() {
     const connector = new Connector('UserController');
     const data = await connector.getRequest('getAll');
 
+    clearList();
+
     data.forEach(function (user) {
         const li = document.createElement('li');
         li.classList.add('list-group-item');
@@ -187,6 +189,8 @@ async function editItem(li) {
         button.removeEventListener('click', createUser);
 
         const updateOnClick = async function (event) {
+            const button = form.querySelector('button');
+            button.removeEventListener('click', updateOnClick);
             event.preventDefault();
             await updateUser(idUser);
         }
@@ -221,7 +225,12 @@ async function updateUser(idUser) {
     formData['method'] = 'updateUser';
 
     const connector = new Connector('UserController');
-    const data = await connector.postRequest(formData);
+
+    try {
+        const data = await connector.postRequest(formData);
+    } catch (error) {
+        console.log(error);        
+    }
 
     const checkboxes = document.querySelectorAll('input[name="roles"]:checked');
     const checkedIds = Array.from(checkboxes).map(checkbox => checkbox.id);
@@ -270,14 +279,18 @@ function cancelEdit() {
 
     const cancelButton = document.querySelector('#cancelButton');
 
-    cancelButton.remove();
+    if (cancelButton) {
+        cancelButton.remove();
+    }
 
     form.reset();
 }
 
 async function reloadScreen() {
+    await createUsersList();
+}
+
+function clearList() {
     const list = document.querySelector('.list-group');
     list.innerHTML = '';
-
-    await createUsersList();
 }
