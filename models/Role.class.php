@@ -99,6 +99,7 @@ class Role {
                         on user_role.FK_idUser = user.idUser
             WHERE
                 user.idUser = :idUser
+                and user_role.isActive = 1
                 and user.isActive = 1
                 and role.isActive = 1",
             [

@@ -151,14 +151,15 @@ async function deleteItem(li) {
 }
 
 async function editItem(li) {
+    const checkboxes = document.querySelectorAll('input[name="roles"]');
+    checkboxes.forEach(function (checkbox) {
+        checkbox.checked = false;
+    });
+
     const idUser = li.getAttribute('id');
 
-    const formData = {};
-    formData['idUser'] = idUser;
-    formData['method'] = 'getUser';
-
     const connector = new Connector('UserController');
-    const data = await connector.postRequest(formData);
+    const data = await connector.getRequest('getUser', `&idUser=${idUser}`);
 
     const form = document.querySelector('form');
     const inputs = form.querySelectorAll('input');
@@ -167,31 +168,43 @@ async function editItem(li) {
         input.value = data[name];
     });
 
-    const header = document.querySelector('#header');
-    header.innerText = 'Editar Usuário';
+    const roles = data.roles;
 
-    const button = form.querySelector('button');
-    button.innerText = 'Salvar';
-    button.removeEventListener('click', createUser);
-
-    const updateOnClick = async function (event) {
-        event.preventDefault();
-        await updateUser(idUser);
+    for (const role of roles) {
+        const checkbox = document.querySelector(`input[type="checkbox"][id="${role.idRole}"]`);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
     }
 
-    button.addEventListener('click', updateOnClick);
+    const header = document.querySelector('#header');
 
-    const passwordDiv = document.querySelector('#passwordDiv');
-    passwordDiv.classList.add('d-none');
+    if (header.innerText != 'Editar Usuário') {
+        header.innerText = 'Editar Usuário';
 
-    const cancelButton = document.createElement('button');
-    cancelButton.classList.add('btn', 'btn-danger', 'btn-sm');
-    cancelButton.innerText = 'Cancelar';
-    cancelButton.id = 'cancelButton';
+        const button = form.querySelector('button');
+        button.innerText = 'Salvar';
+        button.removeEventListener('click', createUser);
 
-    cancelButton.addEventListener('click', cancelEdit);
+        const updateOnClick = async function (event) {
+            event.preventDefault();
+            await updateUser(idUser);
+        }
 
-    form.appendChild(cancelButton);
+        button.addEventListener('click', updateOnClick);
+
+        const passwordDiv = document.querySelector('#passwordDiv');
+        passwordDiv.classList.add('d-none');
+
+        const cancelButton = document.createElement('button');
+        cancelButton.classList.add('btn', 'btn-danger', 'btn-sm');
+        cancelButton.innerText = 'Cancelar';
+        cancelButton.id = 'cancelButton';
+
+        cancelButton.addEventListener('click', cancelEdit);
+
+        form.appendChild(cancelButton);
+    }
 }
 
 async function updateUser(idUser) {
@@ -209,6 +222,30 @@ async function updateUser(idUser) {
 
     const connector = new Connector('UserController');
     const data = await connector.postRequest(formData);
+
+    const checkboxes = document.querySelectorAll('input[name="roles"]:checked');
+    const checkedIds = Array.from(checkboxes).map(checkbox => checkbox.id);
+    checkedIds.forEach(async function (idRole) {
+        const formData = {};
+        formData['idUser'] = idUser;
+        formData['idRole'] = idRole;
+        formData['method'] = 'addRole';
+
+        const connector = new Connector('UserController');
+        const rolesData = await connector.postRequest(formData);
+    });
+
+    const uncheckedCheckboxes = document.querySelectorAll('input[name="roles"]:not(:checked)');
+    const uncheckedIds = Array.from(uncheckedCheckboxes).map(checkbox => checkbox.id);
+    uncheckedIds.forEach(async function (idRole) {
+        const formData = {};
+        formData['idUser'] = idUser;
+        formData['idRole'] = idRole;
+        formData['method'] = 'removeRole';
+
+        const connector = new Connector('UserController');
+        const rolesData = await connector.postRequest(formData);
+    });
 
     form.reset();
 

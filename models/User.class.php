@@ -135,8 +135,6 @@ class User {
             ':idRole' => $idRole,
             ':idUser' => $this->idUser
         ]);
-
-        $this->setIdUser($this->pdo->getLastInsertedId());
     }
 
     public function removeRole($idRole) {
@@ -196,7 +194,7 @@ class User {
 
         $roles = array();
         foreach ($this->roles as $role) {
-            $roles[] = $role->toJson();
+            $roles[] = $role;
         }
         $data['roles'] = $roles;
 

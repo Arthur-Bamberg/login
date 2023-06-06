@@ -89,12 +89,8 @@ async function deleteItem(li) {
 async function editItem(li) {
     const idRole = li.getAttribute('id');
 
-    const formData = {};
-    formData['idRole'] = idRole;
-    formData['method'] = 'getRole';
-
     const connector = new Connector('RoleController');
-    const data = await connector.postRequest(formData);
+    const data = await connector.getRequest('getRole', '&idRole=' + idRole);
 
     const form = document.querySelector('form');
     const inputs = form.querySelectorAll('input');
